@@ -11,3 +11,5 @@ Route handler (chat.js)
 Logger writes to file (logger.js)
    ↓
 logs/app.log   (THIS is what dashboard reads)
+
+# Test attempt for class project
