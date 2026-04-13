@@ -1,1 +1,9 @@
+{
+  "name": "full-logging-app",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
 
