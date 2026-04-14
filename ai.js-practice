@@ -1,4 +1,7 @@
-const API_URL = "http://sushi.it.ilstu.edu:8080";
+const API_URL = "http://sushi.it.ilstu.edu:8080/api/chat/completions";
+
+const MODEL = "llama3"; // or whatever model is listed in /api/v1/models
+const API_KEY = "PASTE_KEY_HERE";
 
 export async function analyzeLog(logData) {
   const prompt = `
@@ -6,8 +9,8 @@ You are a cybersecurity analyst.
 
 Analyze this log and explain:
 1. What happened
-2. Whether it's malicious
-3. Why it matters
+2. Whether it is malicious
+3. Why it is dangerous
 4. How to fix it
 
 Log:
@@ -15,51 +18,48 @@ ${JSON.stringify(logData, null, 2)}
 `;
 
   try {
-    // 🔥 We are intentionally testing the server behavior
     const res = await fetch(API_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+
+        // Open WebUI usually accepts this OR ignores it
+        "Authorization": `Bearer ${API_KEY}`
       },
       body: JSON.stringify({
-        message: prompt,
-        log: logData
+        model: MODEL,
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        stream: false
       })
     });
 
-    // 🔍 Show status code
-    console.log("🔥 AI STATUS:", res.status);
-    console.log("🔥 AI STATUS TEXT:", res.statusText);
+    console.log("🔥 STATUS:", res.status);
 
-    // 🔍 Get raw response
     const text = await res.text();
-    console.log("🔥 RAW AI RESPONSE:", text);
+    console.log("🔥 RAW RESPONSE:", text);
 
-    // If request failed, stop here
     if (!res.ok) {
-      return `AI request failed (${res.status}): ${text}`;
+      return `AI error (${res.status}): ${text}`;
     }
 
-    // Try parsing JSON (if it is JSON)
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      // If not JSON, just return raw text
-      return text;
-    }
+    const data = JSON.parse(text);
 
-    // Try multiple possible response formats
     return (
       data?.choices?.[0]?.message?.content ||
-      data?.message ||
+      data?.message?.content ||
       data?.response ||
       data?.output ||
-      JSON.stringify(data)
+      text
     );
 
   } catch (err) {
-    console.log("🔥 FULL AI ERROR:", err);
+    console.log("🔥 ERROR:", err);
     return "AI analysis failed: " + err.message;
   }
 }
+
