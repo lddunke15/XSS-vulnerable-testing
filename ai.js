@@ -1,6 +1,5 @@
-import fetch from "node-fetch";
 
-const API_URL = "http://sushi.it.ilstu.edu:8080/api/chat/completions";
+const API_URL = "http://sushi.it.ilstu.edu:8080";
 const MODEL = "translategemma:latest";
 const API_KEY = "sk-35f5c79a4e6a4e4592986c51dc71eca3";
 
@@ -37,7 +36,33 @@ ${JSON.stringify(logData, null, 2)}
     return data.choices[0].message.content;
 
   } catch (err) {
-    return "AI analysis failed: " + err.message;
-  }
+const res = await fetch(API_URL, {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: MODEL,
+    messages: [
+      {
+        role: "user",
+        content: prompt
+      }
+    ]
+  })
+});
+
+const text = await res.text();
+console.log("🔥 RAW AI RESPONSE:", text);
+
+let data;
+try {
+  data = JSON.parse(text);
+} catch (e) {
+  throw new Error("Invalid JSON from AI server");
 }
+
+return data?.choices?.[0]?.message?.content || "No AI response";
+
 
