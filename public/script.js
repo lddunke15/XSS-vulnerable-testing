@@ -14,5 +14,6 @@ async function sendMessage() {
   const data = await res.json();
 
   document.getElementById("response").innerText = data.reply;
+  document.getElementById("analysis").innerText = data.analysis;
 }
 
