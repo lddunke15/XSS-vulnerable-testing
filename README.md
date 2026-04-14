@@ -25,3 +25,6 @@ logs/app.log   (THIS is what dashboard reads)
 - make the website say relevant things
 - maybe make the website look good
 - dont have logs on website page
+
+
+sudo apt install openconnect network-manager-openconnect network-manager-openconnect-gnome
