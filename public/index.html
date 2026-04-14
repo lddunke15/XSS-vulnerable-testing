@@ -4,10 +4,10 @@
   <title>Test Page</title>
 </head>
 <body>
-  <h1>🧪 XSS / Log Test Page</h1>
+  <h1>🧪 XSS Test Page</h1>
 
-  <input id="input" placeholder="type payload" />
-  <button onclick="sendLog()">Send Log</button>
+  <input id="input" placeholder="payload" />
+  <button onclick="sendLog()">Send</button>
 
   <script>
     function sendLog() {
@@ -19,8 +19,8 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          payload: payload,
-          url: window.location.href
+          payload,
+          page: window.location.href
         })
       });
 
@@ -28,6 +28,6 @@
     }
   </script>
 
-  <a href="/dashboard.html">Go to Dashboard</a>
+  <a href="/dashboard.html">Dashboard</a>
 </body>
 </html>
