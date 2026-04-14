@@ -1,4 +1,3 @@
-export default router;
 import express from "express";
 import { logEvent } from "../logger.js";
 import { analyzeLog } from "../ai.js";
@@ -30,8 +29,4 @@ router.post("/completions", async (req, res) => {
     analysis: analysis
   });
 });
-
-
-
-
-
+export default router;
