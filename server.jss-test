@@ -1,0 +1,51 @@
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import { analyzeLog } from "./ai.js";
+
+const app = express();
+const port = 3000;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
+
+let logs = [];
+
+// ======================
+// 📥 LOG + AI PIPELINE
+// ======================
+app.post("/log", async (req, res) => {
+  console.log("🔥 LOG RECEIVED:", req.body);
+
+  const aiResult = await analyzeLog(req.body);
+
+  const entry = {
+    id: logs.length + 1,
+    time: new Date().toISOString(),
+    ip: req.ip,
+    data: req.body,
+    ai: aiResult   // 👈 THIS is what dashboard will use
+  };
+
+  logs.unshift(entry);
+
+  res.json({
+    success: true,
+    ai: aiResult
+  });
+});
+
+// ======================
+// 📊 DASHBOARD API
+// ======================
+app.get("/api/logs", (req, res) => {
+  res.json(logs);
+});
+
+app.listen(port, () => {
+  console.log(`🚀 http://localhost:${port}`);
+  console.log(`📊 http://localhost:${port}/dashboard.html`);
+});
