@@ -22,3 +22,6 @@ logs/app.log   (THIS is what dashboard reads)
 - get the AI api call to function
 - write the report
 - make the video
+- make the website say relevant things
+- maybe make the website look good
+- dont have logs on website page
