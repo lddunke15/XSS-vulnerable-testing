@@ -19,25 +19,32 @@ ${JSON.stringify(logData, null, 2)}
 `;
 
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: "user", content: prompt }
-        ]
-      })
-    });
+const res = await fetch(API_URL, {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: MODEL,
+    messages: [
+      {
+        role: "user",
+        content: prompt
+      }
+    ]
+  })
+});
 
-    const data = await res.json();
-    return data.choices[0].message.content;
+const text = await res.text();
+console.log("🔥 RAW AI RESPONSE:", text);
 
-  } catch (err) {
-    return "AI analysis failed: " + err.message;
-  }
+let data;
+try {
+  data = JSON.parse(text);
+} catch (e) {
+  throw new Error("Invalid JSON from AI server");
 }
+
+return data?.choices?.[0]?.message?.content || "No AI response";
 
