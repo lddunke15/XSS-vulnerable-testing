@@ -1,0 +1,60 @@
+export async function analyzeLog(log) {
+  const url = "http://sushi.it.ilstu.edu:8080/ollama/v1/chat/completions";
+
+  const prompt = `
+You are a cybersecurity log analyzer.
+
+Classify this request:
+- Type: XSS, SQLi, Normal, Unknown
+- Severity: low, medium, high
+- Explanation (short)
+- Fix suggestion
+
+LOG:
+${JSON.stringify(log)}
+`;
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "translategemma:latest",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        stream: false
+      })
+    });
+
+    const data = await res.json();
+
+    // 🔥 DEBUG: always show raw response once in console
+    console.log("🧠 AI RAW RESPONSE:", data);
+
+    // ✅ Try all known response formats (Ollama / OpenAI / proxies)
+    const output =
+      data?.choices?.[0]?.message?.content ||   // OpenAI format
+      data?.message?.content ||                  // Ollama chat format
+      data?.response ||                          // simple generate format
+      data?.output ||                            // some proxies
+      data?.text ||                              // fallback
+      null;
+
+    // ⚠️ If still nothing, return full JSON so you SEE the problem
+    if (!output) {
+      return "⚠️ AI returned unknown format:\n" + JSON.stringify(data, null, 2);
+    }
+
+    return output;
+
+  } catch (err) {
+    console.log("❌ AI REQUEST FAILED:", err);
+    return "AI request failed (network / endpoint issue)";
+  }
+}
