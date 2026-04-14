@@ -31,7 +31,6 @@ router.post("/completions", async (req, res) => {
   });
 });
 
-export default router;
 
 
 
