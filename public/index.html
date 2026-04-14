@@ -1,23 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Chat Logger</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Test Page</title>
 </head>
 <body>
+  <h1>🧪 XSS / Log Test Page</h1>
 
-  <h1>Chat Test</h1>
+  <input id="input" placeholder="type payload" />
+  <button onclick="sendLog()">Send Log</button>
 
-  <input type="text" id="message" placeholder="Type something..." />
-  <button onclick="sendMessage()">Send</button>
+  <script>
+    function sendLog() {
+      const payload = document.getElementById("input").value;
 
-  <p id="response"></p>
+      fetch("/log", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          payload: payload,
+          url: window.location.href
+        })
+      });
 
-  <p><strong>AI Analysis:</strong></p>
-  <pre id="analysis"></pre>
+      alert("sent");
+    }
+  </script>
 
-  <script src="script.js"></script>
+  <a href="/dashboard.html">Go to Dashboard</a>
 </body>
 </html>
-
-
