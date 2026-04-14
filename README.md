@@ -29,3 +29,12 @@ logs/app.log   (THIS is what dashboard reads)
 
 sudo apt install openconnect network-manager-openconnect network-manager-openconnect-gnome
 curl -X OPTIONS http://sushi.it.ilstu.edu:8080/api/chat/completions -i
+
+.ilstu.edu:8080/
+HTTP/1.1 405 Method Not Allowed
+date: Tue, 14 Apr 2026 01:38:09 GMT
+server: uvicorn
+content-length: 31
+content-type: application/json
+x-process-time: 0
+
