@@ -17,3 +17,6 @@ logs/app.log   (THIS is what dashboard reads)
 - npm install when you cd into the file
 - the npm install is for the package.json
 - node server.js is the next step. 
+
+## Final Steps
+- get the AI api call to function
