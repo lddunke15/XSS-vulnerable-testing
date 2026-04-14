@@ -1,0 +1,65 @@
+const API_URL = "http://sushi.it.ilstu.edu:8080";
+
+export async function analyzeLog(logData) {
+  const prompt = `
+You are a cybersecurity analyst.
+
+Analyze this log and explain:
+1. What happened
+2. Whether it's malicious
+3. Why it matters
+4. How to fix it
+
+Log:
+${JSON.stringify(logData, null, 2)}
+`;
+
+  try {
+    // 🔥 We are intentionally testing the server behavior
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: prompt,
+        log: logData
+      })
+    });
+
+    // 🔍 Show status code
+    console.log("🔥 AI STATUS:", res.status);
+    console.log("🔥 AI STATUS TEXT:", res.statusText);
+
+    // 🔍 Get raw response
+    const text = await res.text();
+    console.log("🔥 RAW AI RESPONSE:", text);
+
+    // If request failed, stop here
+    if (!res.ok) {
+      return `AI request failed (${res.status}): ${text}`;
+    }
+
+    // Try parsing JSON (if it is JSON)
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      // If not JSON, just return raw text
+      return text;
+    }
+
+    // Try multiple possible response formats
+    return (
+      data?.choices?.[0]?.message?.content ||
+      data?.message ||
+      data?.response ||
+      data?.output ||
+      JSON.stringify(data)
+    );
+
+  } catch (err) {
+    console.log("🔥 FULL AI ERROR:", err);
+    return "AI analysis failed: " + err.message;
+  }
+}
