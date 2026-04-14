@@ -17,7 +17,13 @@
         logs.map(l => `
           <div style="border:1px solid #ccc;margin:10px;padding:10px;">
             <b>${l.time}</b><br/>
+
             <pre>${JSON.stringify(l.data, null, 2)}</pre>
+
+            <hr/>
+
+            <b>🧠 AI Analysis:</b>
+            <pre>${l.ai}</pre>
           </div>
         `).join("");
     }
@@ -27,4 +33,3 @@
   </script>
 </body>
 </html>
-
