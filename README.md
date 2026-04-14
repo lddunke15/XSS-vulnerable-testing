@@ -28,3 +28,4 @@ logs/app.log   (THIS is what dashboard reads)
 
 
 sudo apt install openconnect network-manager-openconnect network-manager-openconnect-gnome
+curl -X OPTIONS http://sushi.it.ilstu.edu:8080/api/chat/completions -i
