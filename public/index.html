@@ -1,33 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Test Page</title>
+  <title>Log Tester</title>
 </head>
 <body>
-  <h1>🧪 XSS Test Page</h1>
 
-  <input id="input" placeholder="payload" />
-  <button onclick="sendLog()">Send</button>
+<h1>Send Log</h1>
 
-  <script>
-    function sendLog() {
-      const payload = document.getElementById("input").value;
+<input id="input" placeholder="type something..." />
+<button onclick="sendLog()">Send</button>
 
-      fetch("/log", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          payload,
-          page: window.location.href
-        })
-      });
+<h2>AI Output</h2>
+<pre id="output"></pre>
 
-      alert("sent");
-    }
-  </script>
+<script>
+async function sendLog() {
+  const value = document.getElementById("input").value;
 
-  <a href="/dashboard.html">Dashboard</a>
+  const res = await fetch("/log", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ message: value })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("output").innerText =
+    data.ai || "No response";
+}
+</script>
+
 </body>
 </html>
