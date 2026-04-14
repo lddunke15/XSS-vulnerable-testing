@@ -1,14 +1,15 @@
-const API_URL = "http://sushi.it.ilstu.edu:8080";
-const MODEL = "translategemma:latest";
+const API_URL = "http://sushi.it.ilstu.edu:8080/api/chat/completions";
+
+const MODEL = "llama3.2-vision:latest"; // or whatever model is listed in /api/v1/models
 const API_KEY = "sk-35f5c79a4e6a4e4592986c51dc71eca3";
 
 export async function analyzeLog(logData) {
   const prompt = `
 You are a cybersecurity analyst.
 
-Analyze this request log and explain:
-1. What the user is doing
-2. Whether it is malicious (XSS, injection, etc.)
+Analyze this log and explain:
+1. What happened
+2. Whether it is malicious
 3. Why it is dangerous
 4. How to fix it
 
@@ -20,8 +21,10 @@ ${JSON.stringify(logData, null, 2)}
     const res = await fetch(API_URL, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${API_KEY}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+
+        // Open WebUI usually accepts this OR ignores it
+        "Authorization": `Bearer ${API_KEY}`
       },
       body: JSON.stringify({
         model: MODEL,
@@ -30,35 +33,32 @@ ${JSON.stringify(logData, null, 2)}
             role: "user",
             content: prompt
           }
-        ]
+        ],
+        stream: false
       })
     });
 
-    // 🔍 Debug status
-    console.log("AI STATUS:", res.status);
+    console.log("🔥 STATUS:", res.status);
 
-    // Get raw response text first (IMPORTANT for debugging)
     const text = await res.text();
-    console.log("RAW AI RESPONSE:", text);
+    console.log("🔥 RAW RESPONSE:", text);
 
-    // Try parsing JSON safely
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (err) {
-      throw new Error("AI did not return valid JSON");
+    if (!res.ok) {
+      return `AI error (${res.status}): ${text}`;
     }
 
-    // Safely extract message
-    const output =
-      data?.choices?.[0]?.message?.content ||
-      data?.message ||
-      "No AI output returned";
+    const data = JSON.parse(text);
 
-    return output;
+    return (
+      data?.choices?.[0]?.message?.content ||
+      data?.message?.content ||
+      data?.response ||
+      data?.output ||
+      text
+    );
 
   } catch (err) {
-    console.log("🔥 FULL AI ERROR:", err);
+    console.log("🔥 ERROR:", err);
     return "AI analysis failed: " + err.message;
   }
 }
