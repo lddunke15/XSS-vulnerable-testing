@@ -14,38 +14,47 @@ app.use(express.static(path.join(__dirname, "public")));
 
 let logs = [];
 
-// ======================
-// 📥 LOG + AI PIPELINE
-// ======================
+// =========================
+// LOG ENDPOINT (KEEP SIMPLE)
+// =========================
 app.post("/log", async (req, res) => {
-  console.log("🔥 LOG RECEIVED:", req.body);
+  console.log("📥 LOG:", req.body);
 
-  const aiResult = await analyzeLog(req.body);
+  let ai = "pending";
+
+  try {
+    ai = await analyzeLog(req.body); // 🔥 YOUR WORKING AI
+  } catch (err) {
+    console.log("AI ERROR:", err);
+    ai = "AI failed";
+  }
 
   const entry = {
     id: logs.length + 1,
     time: new Date().toISOString(),
-    ip: req.ip,
     data: req.body,
-    ai: aiResult   // 👈 THIS is what dashboard will use
+    ai: ai
   };
 
   logs.unshift(entry);
 
   res.json({
     success: true,
-    ai: aiResult
+    ai
   });
 });
 
-// ======================
-// 📊 DASHBOARD API
-// ======================
+// =========================
+// DASHBOARD API
+// =========================
 app.get("/api/logs", (req, res) => {
   res.json(logs);
 });
 
+// =========================
+// START
+// =========================
 app.listen(port, () => {
-  console.log(`🚀 http://localhost:${port}`);
-  console.log(`📊 http://localhost:${port}/dashboard.html`);
+  console.log(`🚀 Server running: http://localhost:${port}`);
+  console.log(`📊 Dashboard: http://localhost:${port}/dashboard.html`);
 });
