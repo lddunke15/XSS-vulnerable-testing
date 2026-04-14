@@ -35,11 +35,11 @@ ${JSON.stringify(logData, null, 2)}
     });
 
     // 🔍 Debug status
-    console.log("🔥 AI STATUS:", res.status);
+    console.log("AI STATUS:", res.status);
 
     // Get raw response text first (IMPORTANT for debugging)
     const text = await res.text();
-    console.log("🔥 RAW AI RESPONSE:", text);
+    console.log("RAW AI RESPONSE:", text);
 
     // Try parsing JSON safely
     let data;
