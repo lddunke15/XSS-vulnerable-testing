@@ -1,26 +1,36 @@
 import express from "express";
-import path from "path";
-import chatRoute from "./routes/chat.js";
+import logRoutes from "./routes/logs.js";
 
 const app = express();
-const PORT = 3000;
+const port = 3000;
 
-// Middleware
+// ==========================
+// 🔧 Middleware
+// ==========================
 app.use(express.json());
-app.use(express.static("public"));
 
-// Debug: log ALL requests
-app.use((req, res, next) => {
-  console.log(`📥 ${req.method} ${req.url}`);
-  next();
+// ==========================
+// 🧭 Routes
+// ==========================
+app.use("/", logRoutes);
+
+// ==========================
+// 🚀 Root route (optional health check)
+// ==========================
+app.get("/", (req, res) => {
+  res.json({
+    status: "OK",
+    message: "Log server running",
+    dashboard: "/dashboard",
+    logEndpoint: "/log"
+  });
 });
 
-// Routes
-app.use("/api/chat", chatRoute);
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+// ==========================
+// 🚀 Start server
+// ==========================
+app.listen(port, () => {
+  console.log(`🚀 Server running at http://localhost:${port}`);
+  console.log(`📊 Dashboard: http://localhost:${port}/dashboard`);
+  console.log(`📥 Log endpoint: http://localhost:${port}/log`);
 });
-
-
