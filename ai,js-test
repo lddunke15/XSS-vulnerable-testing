@@ -1,72 +1,57 @@
-export async function analyzeLog(log) {
-  const url = "http://sushi.it.ilstu.edu:8080/ollama/v1/chat/completions";
+const API_URL = "http://sushi.it.ilstu.edu:8080/ollama/v1/chat/completions";
 
-  const payload = {
-    model: "translategemma:latest",
-    messages: [
-      {
-        role: "user",
-        content: `
-You are a cybersecurity analyzer.
+const MODEL = "llama3.2-vision:latest";
 
-Classify this request:
-- Type (XSS, SQLi, Normal, Unknown)
-- Severity (low, medium, high)
-- Explanation
-- Fix suggestion
+export async function analyzeLog(logData) {
+  const prompt = `
+You are a cybersecurity analyst.
 
-LOG:
-${JSON.stringify(log)}
-`
-      }
-    ],
-    stream: false
-  };
+Analyze this log:
+1. What happened
+2. Is it malicious
+3. Severity
+4. Fix
+
+Log:
+${JSON.stringify(logData, null, 2)}
+`;
 
   try {
-    const res = await fetch(url, {
+    const res = await fetch(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        stream: false
+      })
     });
 
-    // 🔥 STEP 1: get raw text first (NOT json yet)
     const text = await res.text();
-
-    console.log("🧠 RAW AI RESPONSE TEXT:", text);
 
     let data;
     try {
       data = JSON.parse(text);
-    } catch (e) {
-      console.log("❌ NOT JSON RESPONSE");
-      return "AI returned non-JSON response:\n" + text;
+    } catch {
+      return text;
     }
 
-    console.log("🧠 PARSED AI RESPONSE:", data);
-
-    // 🔥 STEP 2: try ALL known formats
-    const output =
+    return (
       data?.choices?.[0]?.message?.content ||
       data?.message?.content ||
       data?.response ||
-      data?.output ||
-      data?.text;
-
-    // 🔥 STEP 3: HARD FALLBACK (this prevents undefined forever)
-    if (!output) {
-      return (
-        "⚠️ Could not extract AI output.\n\nRAW:\n" +
-        JSON.stringify(data, null, 2)
-      );
-    }
-
-    return output;
+      "No AI output"
+    );
 
   } catch (err) {
-    console.log("❌ AI REQUEST FAILED:", err);
-    return "AI request failed: " + err.message;
+    console.log("AI ERROR:", err);
+    return "AI analysis failed: " + err.message;
   }
 }
